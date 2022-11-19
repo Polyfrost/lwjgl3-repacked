@@ -10,70 +10,73 @@ plugins {
 }
 
 group = "cc.polyfrost"
-version = "1.0.0-alpha23"
+version = "1.0.0-alpha24"
+
+val noArm = project.name.contains("noarm")
 
 base {
-    archivesName.set("lwjgl-$platform")
+    archivesName.set("lwjgl-${project.name}")
 }
 
 repositories {
     mavenCentral()
 }
 
-val shadeCompileOnly: Configuration by configurations.creating
-val shadeSeparate: Configuration by configurations.creating
+val shade: Configuration by configurations.creating
 
 dependencies {
     val lwjglVersion = when (platform.mcVersion) {
         in 10809..11202 -> "3.3.1"
-        in 11203..11802 -> "3.2.1"
+        in 11203..11802 -> if (noArm) "3.2.1" else "3.3.1"
         else -> "3.3.1"
     }
 
     if (platform.mcVersion <= 11202) {
-        shadeCompileOnly("org.lwjgl:lwjgl-stb:$lwjglVersion")
-        shadeCompileOnly("org.lwjgl:lwjgl-tinyfd:$lwjglVersion")
+        shade("org.lwjgl:lwjgl-stb:$lwjglVersion")
+        shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion")
 
-        shadeCompileOnly("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows")
-        shadeCompileOnly("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-windows")
-        shadeCompileOnly("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux")
-        shadeCompileOnly("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-linux")
-        shadeCompileOnly("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos")
-        shadeCompileOnly("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-macos")
-        shadeCompileOnly("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos-arm64")
-        shadeCompileOnly("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-macos-arm64")
+        shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows")
+        shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-windows")
+        shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux")
+        shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-linux")
+        shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos")
+        shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-macos")
+        shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos-arm64")
+        shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-macos-arm64")
 
-        shadeCompileOnly("org.lwjgl:lwjgl:$lwjglVersion")
-        shadeCompileOnly("org.lwjgl:lwjgl:$lwjglVersion:natives-windows")
-        shadeCompileOnly("org.lwjgl:lwjgl:$lwjglVersion:natives-linux")
-        shadeCompileOnly("org.lwjgl:lwjgl:$lwjglVersion:natives-macos")
-        shadeSeparate("org.lwjgl:lwjgl:3.3.1:natives-macos-arm64")
-    }
-
-    shadeCompileOnly("org.lwjgl:lwjgl-nanovg:$lwjglVersion") {
-        isTransitive = false
-    }
-    shadeCompileOnly("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-windows") {
-        isTransitive = false
-    }
-    shadeCompileOnly("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-linux") {
-        isTransitive = false
-    }
-    shadeCompileOnly("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-macos") {
-        isTransitive = false
+        shade("org.lwjgl:lwjgl:$lwjglVersion")
+        shade("org.lwjgl:lwjgl:$lwjglVersion:natives-windows")
+        shade("org.lwjgl:lwjgl:$lwjglVersion:natives-linux")
+        shade("org.lwjgl:lwjgl:$lwjglVersion:natives-macos")
+        shade("org.lwjgl:lwjgl:$lwjglVersion:natives-macos-arm64")
     }
 
-    // force 3.3.1 for this, because
-    // if the user is actually running M1+, LWJGL must be 3.3.0+
-    shadeSeparate("org.lwjgl:lwjgl-nanovg:3.3.1:natives-macos-arm64") {
+    shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion") {
         isTransitive = false
+    }
+    if (platform.mcVersion !in 11203..11802 || noArm) {
+        shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-windows") {
+            isTransitive = false
+        }
+        shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-linux") {
+            isTransitive = false
+        }
+        shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-macos") {
+            isTransitive = false
+        }
+    }
+
+    if (lwjglVersion != "3.2.1") {
+        shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-macos-arm64") {
+            isTransitive = false
+        }
     }
 }
 
 tasks {
     shadowJar {
         archiveClassifier.set("")
-        configurations = listOf(shadeCompileOnly, shadeSeparate)
+        configurations = listOf(shade)
         exclude("META-INF/versions/**")
         exclude("**/module-info.class")
         exclude("**/package-info.class")
@@ -89,7 +92,7 @@ tasks {
 
 publishing {
     publications {
-        register<MavenPublication>("lwjgl-$platform") {
+        register<MavenPublication>("lwjgl-${project.name}") {
             groupId = project.group.toString()
             artifactId = base.archivesName.get()
             artifact(tasks["shadowJar"])

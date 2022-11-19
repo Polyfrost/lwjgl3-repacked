@@ -24,12 +24,10 @@ rootProject.name = "lwjgl3-repacked"
 rootProject.buildFileName = "root.gradle.kts"
 
 listOf(
-    "1.8.9-forge",
-    "1.8.9-fabric",
-    "1.12.2-fabric",
-    "1.12.2-forge",
-    "1.16.2-forge",
-    "1.16.2-fabric"
+    "legacy",
+    "pre-1.19-noarm",
+    "pre-1.19-arm",
+    "post-1.19"
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {
