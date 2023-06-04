@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "cc.polyfrost"
-version = "1.0.0-alpha24"
+version = "1.0.0-alpha26"
 
 val noArm = project.name.contains("noarm")
 
@@ -37,6 +37,10 @@ dependencies {
 
         shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows")
         shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-windows")
+        shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows-x86")
+        shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-windows-x86")
+        shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows-arm64")
+        shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-windows-arm64")
         shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux")
         shade("org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-linux")
         shade("org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos")
@@ -46,6 +50,8 @@ dependencies {
 
         shade("org.lwjgl:lwjgl:$lwjglVersion")
         shade("org.lwjgl:lwjgl:$lwjglVersion:natives-windows")
+        shade("org.lwjgl:lwjgl:$lwjglVersion:natives-windows-x86")
+        shade("org.lwjgl:lwjgl:$lwjglVersion:natives-windows-arm64")
         shade("org.lwjgl:lwjgl:$lwjglVersion:natives-linux")
         shade("org.lwjgl:lwjgl:$lwjglVersion:natives-macos")
         shade("org.lwjgl:lwjgl:$lwjglVersion:natives-macos-arm64")
@@ -68,6 +74,12 @@ dependencies {
 
     if (lwjglVersion != "3.2.1") {
         shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-macos-arm64") {
+            isTransitive = false
+        }
+        shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-windows-x86") {
+            isTransitive = false
+        }
+        shade("org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-windows-arm64") {
             isTransitive = false
         }
     }
