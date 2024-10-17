@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "cc.polyfrost"
-version = "1.0.0-alpha28"
+version = "1.0.0-alpha27"
 
 base {
     archivesName.set("lwjgl-${project.name}")
@@ -20,7 +20,7 @@ val shade: Configuration by configurations.creating
 
 dependencies {
     val version = "3.3.3"
-    val platforms = listOf("windows", "windows-arm64", "windows-x86", "linux", "linux-arm64", "macos", "macos-arm64")
+    val platforms = listOf("windows", "windows-x86", "linux", "macos", "macos-arm64")
     val dependencies = mutableListOf("-nanovg")
     if (project.name == "legacy") {
         dependencies += listOf("-stb", "-tinyfd", "")
